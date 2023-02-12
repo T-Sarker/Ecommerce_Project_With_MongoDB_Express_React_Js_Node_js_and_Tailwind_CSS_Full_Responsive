@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+*{
+    font-family: 'Quicksand', sans-serif;
+}
+
+.productItem{
+    position: relative;
+}
+
+.hoverOption{
+    position: absolute;
+    right: 50px;
+    top: 20px;
+    opacity: 0;
+    -webkit-transition: all, 0.8s;
+    -o-transition: all, 0.8s;
+    transition: all, 0.8s;
+}
+
+.productItem:hover .hoverOption{
+    position: absolute;
+    right: 10px;
+    opacity: 1;
+    -webkit-transition: all, 0.8s;
+    -o-transition: all, 0.8s;
+    transition: all, 0.8s;
+}
