@@ -9,8 +9,8 @@ const Home = () => {
     return (
         <>
 
-            <div className="w-full h-screen bg-cover bg-no-repeat bg-right md:bg-opacity-25 md:bg-[url(https://preview.colorlib.com/theme/divisima/img/bg-2.jpg.webp)] bg-black">
-                <div className="h-screen mx-auto absolute pl-12 top-[35%]">
+            <div className="w-full h-screen bg-cover relative bg-no-repeat bg-right md:bg-opacity-25 md:bg-[url(https://preview.colorlib.com/theme/divisima/img/bg-2.jpg.webp)] bg-black">
+                <div className="absolute pl-12 top-[35%]">
                     <div className="top-[50%] text-white">
                         <p className='text-red-500'>Lorem ipsum dolor sit amet</p>
                         <h2 className='text-2xl text-white mt-5 text-whitemd:text-4xl md:mb-2'>Fall- winter Collection</h2>

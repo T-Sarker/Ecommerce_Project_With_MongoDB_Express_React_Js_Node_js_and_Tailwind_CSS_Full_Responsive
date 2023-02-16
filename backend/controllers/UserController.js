@@ -6,19 +6,14 @@ const jwt = require('jsonwebtoken')
 const fs = require('fs')
 
 exports.register = async (req, res, next) => {
+
     let { name, email, phone, password, address } = req.body
     password = bcrypt.hashSync(password, 10);
     const userExists = await User.findOne({ email: email })
     if (userExists) {
         return res.status(400).json({ type: 'error', msg: 'User Already Exists' })
     }
-    const { filename: image } = req.file;
-    // await sharp(req.file.path)
-    //     .resize(200, 200)
-    //     .jpeg({ quality: 90 })
-    //     .toFile(
-    //         path.resolve(req.file.destination, 'resized', image)
-    //     )
+
     try {
         const user = await User.create({
             name, email, phone, image: req.file.filename, password, address
@@ -33,6 +28,7 @@ exports.register = async (req, res, next) => {
 
 
 exports.login = async (req, res, next) => {
+
     const { email, password } = req.body
 
     try {
