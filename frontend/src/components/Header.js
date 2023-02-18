@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaHeart, FaSearch, FaShoppingCart, FaBars, FaTimes, FaUser } from "react-icons/fa";
 import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import { LogoutUser } from '../features/auth/AuthSlice';
+import { getAllBrands, getAllCategory, getAllProducts } from '../features/product/productSlice';
 
 const Header = () => {
 
     const dispatch = useDispatch()
-    const { isLoading, user, isSuccess, isError, msg } = useSelector((state) => (state.auth))
+    const { isLoading, user, isError } = useSelector((state) => (state.auth))
+    const { isPLoading } = useSelector((state) => (state.products))
 
     const [showMenu, setShowMenu] = useState(false)
 
@@ -16,7 +18,15 @@ const Header = () => {
     }
     const handleLogout = () => {
         dispatch(LogoutUser())
+        window.location.reload();
     }
+    useEffect(() => {
+        dispatch(getAllProducts())
+        dispatch(getAllCategory())
+        dispatch(getAllBrands())
+    }, [isPLoading, isLoading, user])
+
+
     return (
         <>
 
