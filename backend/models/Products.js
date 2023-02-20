@@ -40,6 +40,9 @@ const ProductSchema = mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User'
             },
+            star: {
+                type: Number
+            },
             comment: {
                 type: String
             }

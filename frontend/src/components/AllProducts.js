@@ -13,46 +13,66 @@ const AllProducts = (props) => {
 
     const [modal, setModal] = useState({ type: false, dta: '' })
     const { category, brand, price } = props.filters
-    const [allProducts, setAllProducts] = useState({})
+    const [allProducts, setAllProducts] = useState([])
+    const [sort, setSort] = useState("newest")
 
     // console.log(category + ' ' + brand + ' ' + price);
     const getFilterProduct = async () => {
-        console.log('inside else');
+
         const dtaUrl = imgUrl + `api/product/filter/${category !== undefined ? category : 'no'}/` + `${brand !== undefined ? brand : 'no'}/` + `${price !== undefined ? price : 'no'}`
-        console.log(dtaUrl);
+
         const filteredProduct = await axios.get(dtaUrl, err => { console.log(err) })
-        console.log(filteredProduct.data);
-        setAllProducts(filteredProduct.data)
+
+        setAllProducts(filteredProduct.data.filterProduct)
     }
     useEffect(() => {
         if (category === undefined && brand === undefined && price === undefined) {
-            console.log('inside');
+
             setAllProducts(products ? products.products : null)
         } else {
             getFilterProduct()
-            // let filterData = { category: category !== undefined ? category : 'no', brand: brand !== undefined ? brand : 'no', price: price !== undefined ? price : 'no', }
-            // console.log(filterData);
-            // dispatch(filteredProductlist(filterData))
-            // setAllProducts({})
-            // setAllProducts(filteredProduct ? filteredProduct.products : null)
-
         }
-    }, [category, brand, price,])
+    }, [category, brand, price, products, filteredProduct])
 
+    const resetFilter = () => {
+        setAllProducts(products ? products.products : null)
+    }
 
-    console.log(allProducts);
+    useEffect(() => {
+        if (sort === "newest" && allProducts.length > 0) {
+            console.log(allProducts);
+            const datas = [...allProducts].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+            setAllProducts(datas);
+        } else if (sort === "asc" && allProducts.length > 0) {
+            console.log(allProducts);
+            console.log(typeof (allProducts));
+            const datas = [...allProducts].sort((a, b) => (b.price - a.price))
+            setAllProducts(datas);
+        } else if (sort === "desc" && allProducts.length > 0) {
+            console.log(allProducts);
+            const datas = [...allProducts].sort((a, b) => a.price - b.price)
+            setAllProducts(datas);
+        }
+    }, [sort])
+
     return (
         <>
-            {modal.dta === '' ? '' : <div className={`relative z-10 w-1/2  justify-center items-center mx-auto ${modal ? 'block' : 'hidden'}`}>
-                <div className="w-4/5 fixed top-4  ">
-                    <p className='text-right ' onClick={() => { setModal(false) }}>{modal.dta !== '' ? <FaWindowClose className='text-red-500 text-2xl' /> : ""}</p>
-                    <img src={`${modal.dta}`} alt="" />
-                </div>
-            </div>}
+
+
             <div className="shopWraper md:col-span-2 lg:col-span-3 px-6 border-2 border-gray-200">
-                <div className="filter2OptionWraper flex justify-end">
+                {modal.dta === '' ? '' : <div className={`w-full md:w-1/2 fixed top-[25%] md:top-0 z-10 left-0 bottom-0 right-0 m-auto ${modal ? 'block' : 'hidden'}`}>
+                    <div className="top-4 flex items-center justify-center">
+                        <p className='absolute top-0 right-0' onClick={() => { setModal(false) }}>{modal.dta !== '' ? <FaWindowClose className='text-red-500 text-2xl' /> : ""}</p>
+                        <img src={`${modal.dta}`} className="max-w-full" alt="" />
+                    </div>
+                </div>}
+                <div className={`filter2OptionWraper flex ${category !== undefined || brand !== undefined || price !== undefined ? 'justify-between' : 'justify-end'}`}>
+                    {
+                        category !== undefined || brand !== undefined || price !== undefined ? <p className='bg-gray-300 shadow-md px-4 py-2 uppercase cursor-pointer' onClick={resetFilter}>reset</p> : ''
+                    }
+
                     <div className="max-w-[200px] filter2 flex">
-                        <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-[6px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-[6px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={(e) => setSort(e.target.value)}>
 
                             <option value="newest" defaultValue>Newest</option>
                             <option value="asc">Price Hight to low</option>
@@ -62,131 +82,39 @@ const AllProducts = (props) => {
                 </div>
                 <div className="productWraper">
                     <div className="productItems  grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-4">
+                        {
+                            allProducts ? allProducts.map(product => {
+                                return (
+                                    <div className="productItem items-center shadow-md p-1 mb-4" key={product._id}>
+                                        <div className="p-2 shadow-sm mb-1 relative">
+                                            <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">{product.discount}%</span>
+                                            <div className="imageOptions flex">
+                                                <img src={`${imgUrl}public/uploads/${product.images[1]}`} alt="" />
+                                                <div className="hoverOption">
+                                                    <ul className="my-3 w-[40px]">
+                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart className='inline-block align-middle' /></li>
+                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: `${imgUrl}public/uploads/${product.images[1]}` }) }}><FaRegImages className='inline-block align-middle' /></li>
+                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="categoryText px-3">
+                                            <p className='text-black font-semibold my-1 text-lg capitalize'>{product.title}</p>
+                                            <p className='flex my-1'><FaStar className="text-yellow-300" /><FaStar className="text-yellow-300" /><FaStar className="text-yellow-300" /><FaStar className="text-gray-300" /><FaStar className="text-gray-300" /></p>
+                                            <div className="flex justify-between">
+                                                <div className="flex">
+                                                    <p className=' my-1 font-black text-green-500'>${product.price - (product.price * (product.discount / 100))}</p>
+                                                    <del className='my-1 font-black text-green-300 ml-6'>${product.price}</del>
+                                                </div>
+                                                <p className="bg-purple-400 px-4 flex justify-center items-center"><FaCartPlus /></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            }) : 'No product'
+                        }
 
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://static-01.daraz.com.bd/p/3376ebc0495e17e3e548e622809ee146.jpg" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart className='inline-block align-middle' /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://static-01.daraz.com.bd/p/3376ebc0495e17e3e548e622809ee146.jpg' }) }}><FaRegImages className='inline-block align-middle' /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
-
-
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://cdn.shopify.com/s/files/1/0154/8596/0292/products/product-image-1138050909_800x.jpg?v=1579573373g" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://cdn.shopify.com/s/files/1/0154/8596/0292/products/product-image-1138050909_800x.jpg?v=1579573373' }) }}><FaRegImages /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
-
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://static-01.daraz.com.bd/p/72119f0fd734b50fbc141d31c969a645.jpg" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://static-01.daraz.com.bd/p/72119f0fd734b50fbc141d31c969a645.jpg' }) }}><FaRegImages /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
-
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://static-01.daraz.com.bd/p/5259780ff7a2e29fea935dd4fbda8133.jpg" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://static-01.daraz.com.bd/p/5259780ff7a2e29fea935dd4fbda8133.jpg' }) }}><FaRegImages /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://sc04.alicdn.com/kf/Had47ba4f5bf04b83acd9a220b12d793bi.jpg" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://sc04.alicdn.com/kf/Had47ba4f5bf04b83acd9a220b12d793bi.jpg' }) }}><FaRegImages /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
-                        <div className="productItem items-center shadow-md p-1 mb-4">
-                            <div className="p-2 shadow-sm mb-1 relative">
-                                <span className="bg-blue-500 text-white absolute text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">Default</span>
-                                <div className="imageOptions flex">
-                                    <img src="https://cf.shopee.ph/file/2d64fdb7be48a4d7d78fc3d3e9d05ec4" alt="" />
-                                    <div className="hoverOption">
-                                        <ul className="my-3 w-[40px]">
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: 'https://cf.shopee.ph/file/2d64fdb7be48a4d7d78fc3d3e9d05ec4' }) }}><FaRegImages /></li>
-                                            <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus /></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="categoryText">
-                                <p className='text-black my-1 '>1Clothing product title here</p>
-                                <p className='flex my-1'><FaStar /><FaStar /><FaStar /><FaStar /><FaStar /></p>
-                                <p className=' my-1'>$100.00</p>
-                            </div>
-                        </div>
 
 
                     </div>
