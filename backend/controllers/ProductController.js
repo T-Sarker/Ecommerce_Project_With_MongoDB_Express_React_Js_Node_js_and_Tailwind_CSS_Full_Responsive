@@ -1,4 +1,5 @@
 const Product = require('../models/Products')
+const Wishlist = require('../models/Wishlist')
 const slug = require('../middlewares/slug')
 const ImgResize = require('../middlewares/imgResize')
 const fs = require('fs')
@@ -67,15 +68,19 @@ exports.allFilteredProducts = async (req, res, next) => {
 
 exports.singleProduct = async (req, res, next) => {
     try {
-        const result = await Product.findOne({ slug: req.params.slug }).populate('category').populate('brand')
-        return res.status(200).json({ type: 'success', result })
+        const result = await Product.findOne({ slug: req.params.slug }).populate('category').populate('brand').populate({ path: 'reviews.user', select: ('-password', '-isAdmin') })
+        if (result !== null) {
+            return res.status(200).json({ type: 'success', result })
+        } else {
+            return res.json({ type: 'error', msg: 'Something wrong! try again' + error })
+        }
     } catch (error) {
         console.log(error);
-        return res.status(400).json({ type: 'error', msg: 'Something wrong! try again' + error })
+        return res.json({ type: 'error', msg: 'Something wrong! try again' + error })
     }
 }
 
-
+//update product
 exports.update = async (req, res, next) => {
     const { title, category, brand, details, otherDetails, discount, price, quantity, options } = req.body
     const thumbnailPath = 'public/uploads/product/'
@@ -148,5 +153,52 @@ exports.delete = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         return res.status(400).json({ type: 'error', msg: 'Something wrong! try again' + error })
+    }
+}
+
+//wishlist add
+exports.storeWishList = async (req, res) => {
+    try {
+        const checkWish = await Wishlist.findOne({ product: req.params.id })
+        if (checkWish) {
+            return res.status(200).json({ type: 'error', msg: "Already Exists" })
+        }
+        const wish = await Wishlist.create({
+            product: req.params.id
+        })
+        return res.status(200).json({ type: 'success', msg: "Product added to wishlist" })
+    } catch (error) {
+        return res.status(500).json({ type: 'error', msg: "Product can't added to wishlist" })
+    }
+}
+
+
+exports.deleteWishList = async (req, res) => {
+    try {
+        const wish = await Wishlist.findByIdAndRemove(req.params.id)
+        return res.status(200).json({ type: 'success', msg: "Wishlist removed" })
+    } catch (error) {
+        return res.status(500).json({ type: 'error', msg: "Product can't added to wishlist" })
+    }
+}
+
+
+
+/**
+review add
+*/
+
+exports.addReviewData = async (req, res, next) => {
+    const { comment, stars, pId } = req.body
+    try {
+        const product = await Product.findOne({ _id: pId })
+        if (!product) {
+            return req.status(400).json({ type: 'error', msg: 'Product not found' })
+        }
+
+        await Product.findByIdAndUpdate(pId, { $push: { reviews: { user: req.userId, star: stars, comment: comment } } })
+        return res.status(200).json({ type: 'success', msg: "Review Added" })
+    } catch (error) {
+        return res.status(500).json({ type: 'error', msg: "Review can't added" + error })
     }
 }

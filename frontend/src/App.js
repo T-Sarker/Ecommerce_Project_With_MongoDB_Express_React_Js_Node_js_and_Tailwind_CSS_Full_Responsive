@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import S404 from "./pages/404";
 import Blog from "./pages/Blog";
 import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
@@ -22,8 +23,9 @@ function App() {
         <Route path="/shop" element={<Shop />} ></Route>
         <Route path="/blog" element={<Blog />} ></Route>
         <Route path="/single/blog/:id" element={<SingleBlog />} ></Route>
-        <Route path="/product/:id" element={<SingleShop />} ></Route>
+        <Route path="/product/:slug" element={<SingleShop />} ></Route>
         <Route path="/checkout" element={<Checkout />} ></Route>
+        <Route path="/404" element={<S404 />} ></Route>
       </Routes>
       <Footer />
       <ToastContainer />

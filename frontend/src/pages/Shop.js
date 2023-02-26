@@ -1,21 +1,40 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AllProducts from '../components/AllProducts'
-import { FaThLarge, FaSearch, FaFireAlt, FaDollarSign, FaTape } from "react-icons/fa";
+import { NavLink, useLocation } from 'react-router-dom'
+import { FaThLarge, FaSearch, FaFireAlt, FaDollarSign } from "react-icons/fa";
 import { useSelector } from 'react-redux';
 
-const Shop = () => {
+const Shop = (props) => {
     const { products, category, brands } = useSelector((state) => (state.products))
     const [filters, setFilters] = useState({})
+    const [search, setSearch] = useState('')
+    const location = useLocation()
 
-    // console.log(filters);
+    useEffect(() => {
+        setFilters(location.state || { category: undefined })
+    }, [props])
+
     return (
         <>
             <div className=" w-4/5 mx-auto pt-24 grid md:grid-cols-3 lg:grid-cols-4 gap-2 justify-between">
                 <div className="sidebar md:col-span-1 shadow-sm">
-                    <div className="search flex justify-center items-center p-2 border border-indigo-600">
-                        <input type="text" className='!outline-none' placeholder='search' />
-                        <button><FaSearch className='text-gray-400 mr-2' /></button>
+                    <div className="search relative">
+                        <div className="search flex justify-center items-center p-2 border border-indigo-600">
+                            <input type="text" className='!outline-none' placeholder='search' onChange={(e) => { setSearch(e.target.value) }} />
+                            <button><FaSearch className='text-gray-400 mr-2' /></button>
+                        </div>
+                        <ul className='w-full absolute bg-gray-200'>
+                            {
+                                products && search !== '' ? products.products.map(item => {
+
+                                    return (item.title.includes(search) ?
+                                        <li className='bg-gray-300 hover:text-pink-500 tra font-semibold p-4 my-2 shadow-md'><NavLink to="/">{item.title}</NavLink></li> : ''
+                                    )
+                                }) : ''
+                            }
+                        </ul>
                     </div>
+
                     <div className="category my-4 border-l-2">
 
                         <h3 className='font-bold py-3 uppercase border-b-2 flex justify-between items-center flex-wrap'>Category <span><FaThLarge /></span></h3>

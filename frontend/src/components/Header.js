@@ -47,7 +47,7 @@ const Header = () => {
                         <li className='mx-3'><FaHeart className='font-light' /></li>
                         <li className='mx-3 '><NavLink className='flex items-center' to='/checkout'><FaShoppingCart className='mr-2 font-light' /> $0.00</NavLink></li>
                         {
-                            !user ? <li className='mx-3 '><NavLink className="flex justify-center items-center" to="/login"><FaUser className='font-light mr-1' />Login</NavLink></li> : <li onClick={handleLogout} className='mx-3 flex justify-center items-center'><FaUser className='font-light mr-1' />Logout</li>
+                            !user ? <li className='mx-3 '><NavLink className="flex justify-center items-center" to="/login"><FaUser className='font-light mr-1' />Login</NavLink></li> : <li onClick={handleLogout} className='mx-3 flex justify-center items-center cursor-pointer'><FaUser className='font-light mr-1' />Logout</li>
                         }
                     </ul>
                 </div>
@@ -72,7 +72,7 @@ const Header = () => {
                         <li className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaShoppingCart className='mr-2 font-light' /> $0.00</li>
 
                         {
-                            !user ? <li className='py-2 mb-2 hover:text-pink-500'><NavLink className="flex items-center" to="/login"><FaUser className='me-1 font-light' /> Login</NavLink></li> : <li onClick={handleLogout} className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaUser className='me-1 font-light' /> Logout</li>
+                            !user ? <li className='py-2 mb-2 hover:text-pink-500'><NavLink className="flex items-center" to="/login"><FaUser className='me-1 font-light' /> Login</NavLink></li> : <li onClick={handleLogout} className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaUser className='me-1 font-light cursor-pointer' /> Logout</li>
                         }
                     </ul>
                 </div>

@@ -2,21 +2,24 @@
 import React, { useEffect, useState } from 'react'
 import { FaStar, FaRegImages, FaHeart, FaCartPlus, FaWindowClose } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-import { filteredProductlist } from '../features/shop/shopSlice';
-import { getAllProducts } from '../features/product/productSlice';
+// import { filteredProductlist } from '../features/shop/shopSlice';
+// import { getAllProducts } from '../features/product/productSlice';
 import axios from 'axios';
+import { toast } from "react-toastify"
+import { NavLink } from 'react-router-dom';
+import WishlistHelper from './WishlistHelper';
 const AllProducts = (props) => {
     const imgUrl = "http://localhost:4000/"
-    const dispatch = useDispatch()
-    const { products, isPLoading } = useSelector((state) => (state.products))
-    const { filteredProduct, isSLoading, isSSuccess } = useSelector((state) => (state.shop))
+    // const dispatch = useDispatch()
+    const { products } = useSelector((state) => (state.products))
+    const { filteredProduct } = useSelector((state) => (state.shop))
 
     const [modal, setModal] = useState({ type: false, dta: '' })
     const { category, brand, price } = props.filters
     const [allProducts, setAllProducts] = useState([])
     const [sort, setSort] = useState("newest")
+    const [starsavg, setStarsavg] = useState()
 
-    // console.log(category + ' ' + brand + ' ' + price);
     const getFilterProduct = async () => {
 
         const dtaUrl = imgUrl + `api/product/filter/${category !== undefined ? category : 'no'}/` + `${brand !== undefined ? brand : 'no'}/` + `${price !== undefined ? price : 'no'}`
@@ -55,6 +58,12 @@ const AllProducts = (props) => {
         }
     }, [sort])
 
+    const wishListHandle = async (pId) => {
+
+        WishlistHelper(imgUrl, pId)
+
+    }
+
     return (
         <>
 
@@ -83,7 +92,9 @@ const AllProducts = (props) => {
                 <div className="productWraper">
                     <div className="productItems  grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-4">
                         {
-                            allProducts ? allProducts.map(product => {
+                            allProducts !== null && allProducts.length > 0 ? allProducts.map(product => {
+
+                                // console.log(reviewSum);
                                 return (
                                     <div className="productItem items-center shadow-md p-1 mb-4" key={product._id}>
                                         <div className="p-2 shadow-sm mb-1 relative">
@@ -92,16 +103,61 @@ const AllProducts = (props) => {
                                                 <img src={`${imgUrl}public/uploads/${product.images[1]}`} alt="" />
                                                 <div className="hoverOption">
                                                     <ul className="my-3 w-[40px]">
-                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaHeart className='inline-block align-middle' /></li>
-                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: `${imgUrl}public/uploads/${product.images[1]}` }) }}><FaRegImages className='inline-block align-middle' /></li>
-                                                        <li className='w-10 h-10 bg-white text-center text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
+
+                                                        <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { wishListHandle(product._id) }}><FaHeart className='inline-block align-middle' /></li>
+
+                                                        <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: `${imgUrl}public/uploads/${product.images[1]}` }) }}><FaRegImages className='inline-block align-middle' /></li>
+
+                                                        <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="categoryText px-3">
-                                            <p className='text-black font-semibold my-1 text-lg capitalize'>{product.title}</p>
-                                            <p className='flex my-1'><FaStar className="text-yellow-300" /><FaStar className="text-yellow-300" /><FaStar className="text-yellow-300" /><FaStar className="text-gray-300" /><FaStar className="text-gray-300" /></p>
+                                            <p className='text-black font-semibold my-1 text-lg capitalize h-[55px]'><NavLink to={`/product/${product.slug}`}>{product.title}</NavLink></p>
+
+                                            <div className='flex my-1'>
+                                                {(() => {
+
+                                                    let stars = [];
+                                                    let reviewSum = 0
+
+
+                                                    if (product.reviews.length > 0) {
+                                                        product.reviews.map(rvw => {
+                                                            reviewSum = reviewSum + rvw.star
+                                                        })
+                                                    }
+
+                                                    if (reviewSum > 0) {
+                                                        let avgStar = Math.floor(reviewSum / product.reviews.length)
+                                                        for (let i = 1; i <= 5; i++) {
+
+                                                            if (i <= avgStar) {
+                                                                stars.push(
+                                                                    <FaStar className='text-yellow-300' key={'dd' + i} />
+                                                                )
+                                                            } else {
+                                                                stars.push(
+                                                                    <FaStar className='text-gray-300' key={'dd' + i} />
+                                                                )
+                                                            }
+
+
+                                                        }
+                                                    } else {
+                                                        return <p className='flex my-1'>
+                                                            <FaStar className='text-gray-300' />
+                                                            <FaStar className='text-gray-300' />
+                                                            <FaStar className='text-gray-300' />
+                                                            <FaStar className='text-gray-300' />
+                                                            <FaStar className='text-gray-300' />
+                                                        </p>
+                                                    }
+
+                                                    return stars
+                                                })()}
+                                            </div>
                                             <div className="flex justify-between">
                                                 <div className="flex">
                                                     <p className=' my-1 font-black text-green-500'>${product.price - (product.price * (product.discount / 100))}</p>

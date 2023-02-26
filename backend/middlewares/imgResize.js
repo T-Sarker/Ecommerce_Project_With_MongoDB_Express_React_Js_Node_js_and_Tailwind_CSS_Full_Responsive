@@ -15,5 +15,5 @@ exports.imgResize = async (imgReqFile, folderName) => {
         .toFile(
             path.resolve(imgReqFile.destination, folderName, image)
         )
-    fs.unlink(imgPath + imgReqFile.filename, err => { console.log(err); })
+    // fs.unlink(imgPath + imgReqFile.filename, err => { console.log(err); })
 }

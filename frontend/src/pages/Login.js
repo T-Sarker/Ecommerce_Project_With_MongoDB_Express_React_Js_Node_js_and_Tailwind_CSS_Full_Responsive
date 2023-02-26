@@ -24,7 +24,12 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        dispatch(LoginUser(loginData))
+        if (loginData.email === '' || loginData.password === '') {
+            toast.error("FIleds Can't be empty")
+        } else {
+
+            dispatch(LoginUser(loginData))
+        }
     }
 
     useEffect(() => {

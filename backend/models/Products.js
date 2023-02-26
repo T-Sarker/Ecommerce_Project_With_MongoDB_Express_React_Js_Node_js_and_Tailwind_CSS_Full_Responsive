@@ -33,7 +33,7 @@ const ProductSchema = mongoose.Schema({
         type: String
     },
     images: [],
-    options: {},
+    options: [],
     reviews: [
         {
             user: {
