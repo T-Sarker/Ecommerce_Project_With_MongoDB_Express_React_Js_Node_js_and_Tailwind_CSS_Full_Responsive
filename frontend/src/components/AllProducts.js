@@ -2,17 +2,18 @@
 import React, { useEffect, useState } from 'react'
 import { FaStar, FaRegImages, FaHeart, FaCartPlus, FaWindowClose } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
-// import { filteredProductlist } from '../features/shop/shopSlice';
-// import { getAllProducts } from '../features/product/productSlice';
+
 import axios from 'axios';
 import { toast } from "react-toastify"
 import { NavLink } from 'react-router-dom';
 import WishlistHelper from './WishlistHelper';
+import { addToCart } from '../features/cart/Cart';
 const AllProducts = (props) => {
     const imgUrl = "http://localhost:4000/"
     // const dispatch = useDispatch()
     const { products } = useSelector((state) => (state.products))
     const { filteredProduct } = useSelector((state) => (state.shop))
+    const dispatch = useDispatch()
 
     const [modal, setModal] = useState({ type: false, dta: '' })
     const { category, brand, price } = props.filters
@@ -64,6 +65,21 @@ const AllProducts = (props) => {
 
     }
 
+    const handleCartData = (id, title, image, price, discount) => {
+        if (!localStorage.getItem('user')) {
+            toast.error('Login First')
+        } else {
+            const cartProduct = {
+                id,
+                title,
+                image,
+                price,
+                disCount: discount,
+            }
+            dispatch(addToCart(cartProduct))
+        }
+    }
+
     return (
         <>
 
@@ -108,11 +124,12 @@ const AllProducts = (props) => {
 
                                                         <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: `${imgUrl}public/uploads/${product.images[1]}` }) }}><FaRegImages className='inline-block align-middle' /></li>
 
-                                                        <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
+                                                        <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { handleCartData(product._id, product.title, product.images[0], product.price, product.discount) }}><FaCartPlus className='inline-block align-middle' /></li>
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
+
                                         <div className="categoryText px-3">
                                             <p className='text-black font-semibold my-1 text-lg capitalize h-[55px]'><NavLink to={`/product/${product.slug}`}>{product.title}</NavLink></p>
 
@@ -160,10 +177,10 @@ const AllProducts = (props) => {
                                             </div>
                                             <div className="flex justify-between">
                                                 <div className="flex">
-                                                    <p className=' my-1 font-black text-green-500'>${product.price - (product.price * (product.discount / 100))}</p>
+                                                    <p className=' my-1 font-black text-green-500'>${Math.floor(product.price - (product.price * (product.discount / 100)))}</p>
                                                     <del className='my-1 font-black text-green-300 ml-6'>${product.price}</del>
                                                 </div>
-                                                <p className="bg-purple-400 px-4 flex justify-center items-center"><FaCartPlus /></p>
+                                                <p className="bg-purple-400 px-4 flex justify-center items-center" onClick={() => { handleCartData(product._id, product.title, product.images[0], product.price, product.discount) }}><FaCartPlus /></p>
                                             </div>
                                         </div>
                                     </div>

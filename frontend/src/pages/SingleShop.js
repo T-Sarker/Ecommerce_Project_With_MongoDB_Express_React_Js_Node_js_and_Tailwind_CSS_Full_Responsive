@@ -1,11 +1,16 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { FaStar } from "react-icons/fa";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
+import CartHelper from '../components/CartHelper';
+import { addToCart } from '../features/cart/Cart';
+
+
 const SingleShop = () => {
     const { user } = useSelector((state) => (state.auth))
+    const dispatch = useDispatch()
     const baseUrl = 'http://localhost:4000/'
     const navigate = useNavigate()
     const [imgBar, setImgBar] = useState('')
@@ -14,6 +19,7 @@ const SingleShop = () => {
     let { slug } = useParams();
     const [review, setReview] = useState({ comment: '', stars: null })
     const [click, setclick] = useState(false)
+    const [cartData, setCartData] = useState(0)
 
     const getProductData = async () => {
         const product = await axios.get(baseUrl + 'api/product/single/' + slug)
@@ -71,6 +77,18 @@ const SingleShop = () => {
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const handleCart = () => {
+        const cartProduct = {
+            id: Sproduct._id,
+            title: Sproduct.title,
+            image: Sproduct.images[0],
+            price: Sproduct.price,
+            disCount: Sproduct.discount,
+        }
+
+        dispatch(addToCart(cartProduct))
     }
 
     return (
@@ -146,7 +164,7 @@ const SingleShop = () => {
                                 </div>
                                 - {Sproduct.reviews.length > 0 ? Sproduct.reviews.length : 0} Reviews</div>
                             <p className='text-2xl font-semibold my-4'>${Sproduct.price - (Sproduct.price * (Sproduct.discount / 100))} <del className="text-lg">${Sproduct.price}</del></p>
-                            <p className='bg-purple-400 inline my-4  text-white font-black text-lg uppercase px-3 hover:bg-purple-600 cursor-pointer'>Add to cart</p>
+                            <p className='bg-purple-400 inline my-4  text-white font-black text-lg uppercase px-3 hover:bg-purple-600 cursor-pointer' onClick={handleCart}>Add to cart</p>
                             <p>{Sproduct.details.substring(0, 300)}...</p>
                         </div>
 
@@ -160,7 +178,7 @@ const SingleShop = () => {
                             </ul>
                             <div className="tabContents">
 
-                                <div className={`tabCOntent  ease-in-out duration-500 ${tabNo == 1 ? 'block' : 'hidden'}`}>
+                                <div className={`tabCOntent  ease-in-out duration-500 ${tabNo === 1 ? 'block' : 'hidden'}`}>
                                     <p className='text-gray-400 my-8'>Category: <span className='bg-green-300 text-black px-4 shadow-md mx-4 font-semibold'>{Sproduct.category.name}</span></p>
                                     <p className='text-gray-400 my-8'>Brand: <span className='bg-green-300 text-black px-4 shadow-md mx-4 font-semibold'>{Sproduct.brand.name}</span></p>
                                     {Sproduct.details}
@@ -219,7 +237,7 @@ const SingleShop = () => {
 
 
                                 </div>
-                                <div className={`tabCOntent  ease-in-out duration-500 ${tabNo == 3 ? 'block' : 'hidden'}`}>
+                                <div className={`tabCOntent  ease-in-out duration-500 ${tabNo === 3 ? 'block' : 'hidden'}`}>
                                     3Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus iste, at enim modi repudiandae nulla, officia voluptatibus recusandae molestias neque tenetur repellat aut pariatur soluta sapiente officiis et cupiditate hic.
                                 </div>
                             </div>

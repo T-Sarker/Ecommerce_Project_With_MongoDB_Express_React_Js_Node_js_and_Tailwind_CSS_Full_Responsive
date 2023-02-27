@@ -10,8 +10,11 @@ const Header = () => {
     const dispatch = useDispatch()
     const { isLoading, user, isError } = useSelector((state) => (state.auth))
     const { isPLoading } = useSelector((state) => (state.products))
+    const { cartItems, totalItem, totalAmount } = useSelector((state) => (state.cart))
 
     const [showMenu, setShowMenu] = useState(false)
+
+    const [CartItemCount, setCartItemCount] = useState(0)
 
     const menuClick = () => {
         setShowMenu(!showMenu)
@@ -25,6 +28,12 @@ const Header = () => {
         dispatch(getAllCategory())
         dispatch(getAllBrands())
     }, [isPLoading, isLoading, user])
+
+
+    useEffect(() => {
+        setCartItemCount(totalItem)
+    }, [cartItems, totalItem, totalAmount])
+
 
 
     return (
@@ -45,7 +54,10 @@ const Header = () => {
                     <ul className='flex justify-between items-center hidden md:flex'>
                         {/* <li className='mx-3'><FaSearch className='font-light' /></li> */}
                         <li className='mx-3'><FaHeart className='font-light' /></li>
-                        <li className='mx-3 '><NavLink className='flex items-center' to='/checkout'><FaShoppingCart className='mr-2 font-light' /> $0.00</NavLink></li>
+                        <li className='mx-3 '><NavLink className='flex items-center' to='/checkout'><FaShoppingCart className='mr-2 font-light flex relative' />
+                            <span className='itemCounter bg-blue-400 text-sm font-bold text-white'>{CartItemCount}</span>
+                            <span> $0.00</span>
+                        </NavLink></li>
                         {
                             !user ? <li className='mx-3 '><NavLink className="flex justify-center items-center" to="/login"><FaUser className='font-light mr-1' />Login</NavLink></li> : <li onClick={handleLogout} className='mx-3 flex justify-center items-center cursor-pointer'><FaUser className='font-light mr-1' />Logout</li>
                         }

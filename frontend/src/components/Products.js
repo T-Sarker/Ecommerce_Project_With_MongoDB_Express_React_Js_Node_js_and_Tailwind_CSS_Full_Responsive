@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { FaStar, FaRegImages, FaHeart, FaCartPlus, FaWindowClose } from "react-icons/fa";
 import { NavLink } from 'react-router-dom';
 import WishlistHelper from './WishlistHelper';
+import { addToCart } from '../features/cart/Cart';
 
 const Products = () => {
+    const dispatch = useDispatch()
     const imgUrl = "http://localhost:4000/"
     const { products } = useSelector((state) => (state.products))
     const [tabNo, setTabNo] = useState(1)
@@ -14,6 +16,19 @@ const Products = () => {
         WishlistHelper(imgUrl, pId)
 
     }
+
+    const handleCartData = (id, title, image, price, discount) => {
+        const cartProduct = {
+            id,
+            title,
+            image,
+            price,
+            disCount: discount,
+        }
+
+        dispatch(addToCart(cartProduct))
+    }
+
     return (
         <>
             <div className={`relative z-10 w-1/2  justify-center items-center mx-auto ${modal ? 'block' : 'hidden'}`}>
@@ -51,7 +66,7 @@ const Products = () => {
 
                                                                 <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { setModal({ type: !modal, dta: `${imgUrl}public/uploads/${product.images[1]}` }) }}><FaRegImages className='inline-block align-middle' /></li>
 
-                                                                <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2'><FaCartPlus className='inline-block align-middle' /></li>
+                                                                <li className='w-10 h-10 bg-white text-center cursor-pointer text-black font-bold mb-5 p-2' onClick={() => { handleCartData(product._id, product.title, product.images[0], product.price, product.discount) }}><FaCartPlus className='inline-block align-middle' /></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -102,10 +117,10 @@ const Products = () => {
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <div className="flex">
-                                                            <p className=' my-1 font-black text-green-500'>${product.price - (product.price * (product.discount / 100))}</p>
+                                                            <p className=' my-1 font-black text-green-500'>${Math.floor(product.price - (product.price * (product.discount / 100)))}</p>
                                                             <del className='my-1 font-black text-green-300 ml-6'>${product.price}</del>
                                                         </div>
-                                                        <p className="bg-purple-400 px-4 flex justify-center items-center"><FaCartPlus /></p>
+                                                        <p className="bg-purple-400 px-4 flex justify-center items-center" onClick={() => { handleCartData(product._id, product.title, product.images[0], product.price, product.discount) }}><FaCartPlus /></p>
                                                     </div>
                                                 </div>
                                             </div>
