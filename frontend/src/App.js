@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import Shop from "./pages/Shop";
 import SingleBlog from "./pages/SingleBlog";
 import SingleShop from "./pages/SingleShop";
+import Wishlist from "./pages/WishList";
 function App() {
   return (
     <>
@@ -25,6 +26,7 @@ function App() {
         <Route path="/single/blog/:id" element={<SingleBlog />} ></Route>
         <Route path="/product/:slug" element={<SingleShop />} ></Route>
         <Route path="/checkout" element={<Checkout />} ></Route>
+        <Route path="/wishlist" element={<Wishlist />} ></Route>
         <Route path="/404" element={<S404 />} ></Route>
       </Routes>
       <Footer />

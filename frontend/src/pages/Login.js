@@ -33,10 +33,13 @@ const Login = () => {
     }
 
     useEffect(() => {
+
         if (isSuccess) {
+            console.log(isSuccess);
             toast.success("Login Successfull")
         }
         if (isError) {
+            console.log(isError + msg);
             toast.error(msg)
         }
         if (user) {

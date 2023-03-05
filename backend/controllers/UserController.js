@@ -19,10 +19,10 @@ exports.register = async (req, res, next) => {
             name, email, phone, image: req.file.filename, password, address
         })
 
-        return res.status(200).json({ type: 'success', user })
+        return res.json({ type: 'success', user })
     } catch (error) {
         console.log(error);
-        return res.status(400).json({ type: 'error', msg: 'error' + error })
+        return res.json({ type: 'error', msg: 'error' + error })
     }
 }
 
@@ -45,7 +45,8 @@ exports.login = async (req, res, next) => {
                 }
                 return res.json(userData)
             } else {
-                return res.status(400).json({ type: 'error', msg: "Wrong information" })
+
+                return res.json({ type: 'error', msg: "Wrong information" })
             }
         } else {
             return res.status(400).json({ type: 'error', msg: 'User Don\'t Exists' })

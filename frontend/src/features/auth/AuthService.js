@@ -15,12 +15,14 @@ const registerUser = async (registerData) => {
 
 const loginUser = async (loginData) => {
     try {
-        console.log(process.env.REACT_APP_BASE_URL);
+
         const result = await axios.post(`${baseUrl}/user/login`, loginData)
-        if (result.data) {
+        console.log(result);
+        if (result.data.type !== 'error') {
             localStorage.setItem('user', JSON.stringify(result.data))
-            return result.data
+
         }
+        return result.data
     } catch (error) {
         console.log(error);
     }

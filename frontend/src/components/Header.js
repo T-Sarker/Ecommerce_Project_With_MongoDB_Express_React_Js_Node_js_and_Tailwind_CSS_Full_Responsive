@@ -4,8 +4,11 @@ import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux';
 import { LogoutUser } from '../features/auth/AuthSlice';
 import { getAllBrands, getAllCategory, getAllProducts } from '../features/product/productSlice';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+    const navigate = useNavigate()
 
     const dispatch = useDispatch()
     const { isLoading, user, isError } = useSelector((state) => (state.auth))
@@ -35,6 +38,13 @@ const Header = () => {
     }, [cartItems, totalItem, totalAmount])
 
 
+    const wishPageHandle = () => {
+        if (!localStorage.getItem('user')) {
+            toast.error('Login First')
+        } else {
+            navigate('/wishlist')
+        }
+    }
 
     return (
         <>
@@ -53,10 +63,10 @@ const Header = () => {
                 <div className="iconMenu">
                     <ul className='flex justify-between items-center hidden md:flex'>
                         {/* <li className='mx-3'><FaSearch className='font-light' /></li> */}
-                        <li className='mx-3'><FaHeart className='font-light' /></li>
+                        <li className='mx-3 cursor-pointer' onClick={wishPageHandle}><FaHeart className='font-light' /></li>
                         <li className='mx-3 '><NavLink className='flex items-center' to='/checkout'><FaShoppingCart className='mr-2 font-light flex relative' />
                             <span className='itemCounter bg-blue-400 text-sm font-bold text-white'>{CartItemCount}</span>
-                            <span> $0.00</span>
+                            <span className='text-blue-400 font-bold'> ${totalAmount !== 0 ? totalAmount : '0.00'}</span>
                         </NavLink></li>
                         {
                             !user ? <li className='mx-3 '><NavLink className="flex justify-center items-center" to="/login"><FaUser className='font-light mr-1' />Login</NavLink></li> : <li onClick={handleLogout} className='mx-3 flex justify-center items-center cursor-pointer'><FaUser className='font-light mr-1' />Logout</li>
@@ -81,7 +91,7 @@ const Header = () => {
                         <li className='py-2 mb-2 hover:text-pink-500'><NavLink to="/blog">Blog</NavLink></li>
                         <li className='py-2 mb-2 hover:text-pink-500'><NavLink to="">Contact</NavLink></li>
                         <li className='py-2 mb-2 hover:text-pink-500'><FaHeart className='font-light' /></li>
-                        <li className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaShoppingCart className='mr-2 font-light' /> $0.00</li>
+                        <li className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaShoppingCart className='mr-2 font-light' /> ${totalAmount !== 0 ? totalAmount : 0.00}</li>
 
                         {
                             !user ? <li className='py-2 mb-2 hover:text-pink-500'><NavLink className="flex items-center" to="/login"><FaUser className='me-1 font-light' /> Login</NavLink></li> : <li onClick={handleLogout} className='py-2 mb-2 hover:text-pink-500 flex items-center'><FaUser className='me-1 font-light cursor-pointer' /> Logout</li>

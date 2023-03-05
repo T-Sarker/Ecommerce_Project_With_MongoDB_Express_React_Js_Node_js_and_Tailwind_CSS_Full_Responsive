@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-expressions */
 import { createSlice } from '@reduxjs/toolkit'
 
+let Tamount = 0
+let amount = localStorage.getItem('cart') && JSON.parse(localStorage.getItem('cart')).map(item => { Tamount += (item.price - (item.price * (item.disCount / 100))) })
 
 const initialState = {
-    cartItems: [],
-    totalItem: 0,
-    totalAmount: 0,
+    cartItems: localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [],
+    totalItem: localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')).length : 0,
+    totalAmount: Tamount,
 
 }
 
@@ -27,6 +29,8 @@ const CartSlice = createSlice({
                 state.totalItem += 1
                 state.totalAmount = Math.floor(state.totalAmount + (action.payload.price - (action.payload.price * (action.payload.disCount / 100))))
             }
+
+            localStorage.setItem('cart', JSON.stringify(state.cartItems))
         }
     },
 })

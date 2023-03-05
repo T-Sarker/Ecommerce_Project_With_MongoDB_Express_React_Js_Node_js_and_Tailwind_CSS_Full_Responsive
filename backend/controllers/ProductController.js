@@ -164,11 +164,22 @@ exports.storeWishList = async (req, res) => {
             return res.status(200).json({ type: 'error', msg: "Already Exists" })
         }
         const wish = await Wishlist.create({
-            product: req.params.id
+            product: req.params.id,
+            user: req.userId
         })
         return res.status(200).json({ type: 'success', msg: "Product added to wishlist" })
     } catch (error) {
         return res.status(500).json({ type: 'error', msg: "Product can't added to wishlist" })
+    }
+}
+
+
+exports.allWishList = async (req, res) => {
+    try {
+        const wish = await Wishlist.find({ user: req.userId }).populate('product')
+        return res.status(200).json({ type: 'success', wish })
+    } catch (error) {
+        return res.status(400).json({ type: 'error', msg: "Product can't added to wishlist" + error })
     }
 }
 
