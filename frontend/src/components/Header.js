@@ -65,8 +65,11 @@ const Header = () => {
                         {/* <li className='mx-3'><FaSearch className='font-light' /></li> */}
                         <li className='mx-3 cursor-pointer' onClick={wishPageHandle}><FaHeart className='font-light' /></li>
                         <li className='mx-3 '><NavLink className='flex items-center' to='/checkout'><FaShoppingCart className='mr-2 font-light flex relative' />
-                            <span className='itemCounter bg-blue-400 text-sm font-bold text-white'>{CartItemCount}</span>
-                            <span className='text-blue-400 font-bold'> ${totalAmount !== 0 ? totalAmount : '0.00'}</span>
+                            {
+                                !user ? <><span className='itemCounter bg-blue-400 text-sm font-bold text-white'>0</span>
+                                    <span className='text-blue-400 font-bold'> $ 0.00 </span></> : <><span className='itemCounter bg-blue-400 text-sm font-bold text-white'>{CartItemCount}</span>
+                                    <span className='text-blue-400 font-bold'> ${totalAmount !== 0 ? totalAmount : '0.00'}</span></>
+                            }
                         </NavLink></li>
                         {
                             !user ? <li className='mx-3 '><NavLink className="flex justify-center items-center" to="/login"><FaUser className='font-light mr-1' />Login</NavLink></li> : <li onClick={handleLogout} className='mx-3 flex justify-center items-center cursor-pointer'><FaUser className='font-light mr-1' />Logout</li>
